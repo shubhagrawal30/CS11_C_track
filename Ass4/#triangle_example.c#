@@ -1,0 +1,7 @@
+(board);
+
+    printf("Here is the board you entered:\n");
+    triangle_print(board);
+
+    return 0;
+}

@@ -1,0 +1,42 @@
+/*
+ * CS 11 C track, Winter 2019
+ * Shubh Agrawal, Class of 2022
+ * Assignment 1
+ * 
+ * hello3.c
+ */
+
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+int get_n(int min, int max)
+{
+        srand(time(0));
+        return (rand() % (max - min)) + min;
+}
+
+
+int main(void)
+{
+        char name[100];
+        int i, n = get_n(1, 10);
+        
+        printf("Enter your name: ");
+        scanf("%99s", name);
+        char *msg;
+        if (n % 2 == 0)
+          {
+            msg = "hello";
+          }
+        else
+          {
+            msg = "hi there";
+          }
+        for (i = 0; i < n; i++)
+          {
+            printf("%d: %s, %s!\n", n, msg, name);
+          }
+        return 0;
+}
+

@@ -1,0 +1,181 @@
+/*
+ * CS 11 C track, Winter 2019
+ * Shubh Agrawal, Class of 2022
+ * Assignment 5
+ * 
+ * quicksorter.c
+ * Accepts numbers and prints them in sorted order
+ *   using linked lists.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include "linked_list.h"
+#include "memcheck.h"
+
+/* Prints the usage message.
+ * 
+ * Passed Arguments: 
+ * name: string representing the program name.
+ */
+void usage(char *name);
+
+/* Sorts integers in passed array using 
+ * quicksort algorithm in ascending order. 
+ *
+ * Passed Arguments: 
+ * original: pointer to start node of linked list.
+ */
+node *quicksort(node *original);
+
+/* Returns a linked list containing all nodes whose
+ * value is smaller than the first node.
+ *
+ * Passed Arguments: 
+ * original: pointer to start node of linked list.
+ */
+node *get_smaller(node *original);
+
+/* Returns a linked list containing all nodes whose
+ * value is larger than or equal to the first node.
+ *
+ * Passed Arguments: 
+ * original: pointer to start node of linked list.
+ */
+node *get_larger(node *original);
+
+
+void usage(char *name)
+{
+  fprintf(stderr, \
+    "usage: %s [-b] [-q] number1 [number2 ... ] (maximum 32 numbers)\n", name);
+  exit(EXIT_FAILURE);
+}
+
+
+/* Starting point of program. */
+int main(int argc, char *argv[])
+{
+  int output = 1;
+  int i;
+  node *list = NULL, *sorted_list;
+
+  /* Checks for correct number of arguments. */
+  if (argc == 0)
+    {
+      usage(argv[0]);
+    }
+  
+  for (i = 1; i < argc; i++)
+    {
+
+      /* Checks for optional arguments. */
+      
+      if (strcmp(argv[i], "-q") == 0)
+        {
+          output = 0;
+          continue;
+        }
+
+      list = create_node(atoi(argv[i]), list);
+      
+    }
+
+  if (list == NULL)
+    {
+      usage(argv[0]);
+    }
+
+  sorted_list = quicksort(list);
+  free_list(list);
+
+  if (output)
+    {
+      print_list(sorted_list);
+    }
+
+  free_list(sorted_list);
+
+  print_memory_leaks();
+  
+  return EXIT_SUCCESS;
+}
+
+
+node *quicksort(node *original)
+{
+	node *value, *larger, *smaller, *temp, *current, *list;
+
+	if(original == NULL || original->next == NULL) {
+		value = copy_list(original);
+	}
+
+	else {
+
+		list = copy_list(original);
+		smaller = get_smaller(list);
+		larger = get_larger(list);
+
+		temp = quicksort(smaller);
+		free_list(smaller);
+		smaller = temp;
+
+		temp = quicksort(larger);
+		free_list(larger);
+		larger = temp;
+
+		current = create_node(list->data, NULL);
+
+		temp = append_lists(smaller, current);
+		value = append_lists(temp, larger);
+
+		free_list(smaller);
+		free_list(larger);
+		free_list(temp);
+		free_list(list);
+		free_list(current);
+	}
+	
+	/* Asserts that array is in ascending order. */
+  	assert(is_sorted(value));
+  	return value;
+
+}
+
+
+node *get_smaller(node *original)
+{
+    node *list = copy_list(original);
+    node *value = NULL;
+    int first = list->data;
+    node *current = list->next;
+
+    while (current != NULL) {
+       if (current->data < first) {
+          value = create_node(current->data, value);
+          }
+          current = current->next;
+	}
+  free_list(list);
+  return value;
+}
+
+node *get_larger(node *original)
+{
+  node *list = copy_list(original);
+  node *value = NULL;
+  int first = list->data;
+  node *current = list->next;
+
+    while (current != NULL) {
+      if (current->data >= first) {
+        value = create_node(current->data, value);
+    }
+    current = current->next;
+  }
+
+  free_list(list);
+  return value;
+}
